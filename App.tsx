@@ -1,11 +1,9 @@
-import React, {useState , useEffect} from 'react';
-import {StyleSheet, FlatList , Text,View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {StyleSheet, FlatList, Text, View} from 'react-native';
 
 import {getListMovies} from './src/api/apiCalls/MoviesList';
-import { Movie } from '../MovieApp/src/components/models/ListModel';
-import MovieList from '../MovieApp/src/components/MovieList'; // Import the MovieList component
-
-
+import {Movie} from '../MovieApp/src/components/models/ListModel';
+import MovieList from '../MovieApp/src/components/MoviesList'
 function App() {
   const [moviesList, setMovies] = useState<Movie[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -14,9 +12,9 @@ function App() {
       try {
         const response = await getListMovies();
         console.log('data ...', response.data);
-        setMovies(response.data.results)
+        setMovies(response.data.results);
       } catch (error: any) {
-        setError(error.message)
+        setError(error.message);
         console.log('error ...', error.message);
       }
     };
@@ -41,11 +39,7 @@ function App() {
       {error ? (
         <Text>Error: {error}</Text>
       ) : (
-        <FlatList
-          data={moviesList}
-          renderItem={({item}) => <Item data={item} />}
-          keyExtractor={(item) => item.id.toString()}
-        />
+        <MovieList movies={moviesList}/>
       )}
     </View>
   );
@@ -57,8 +51,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   container: {
-    flex : 1
-  }
+    flex: 1,
+  },
 });
 
 export default App;
