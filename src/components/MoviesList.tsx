@@ -1,37 +1,42 @@
 import {FlatList, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {Movie} from './models/ListModel';
+import MovieCard from './MovieCard';
 
 export type Props = {
   movies: Movie[];
+  title: string;
 };
 
-const Item = ({data}: {data: Movie}) => (
-  <View
-    style={styles.movieCard}>
-    <Text style={{fontSize: 24}}>{data.title}</Text>
-  </View>
-);
-
-const MoviesList: React.FC<Props> = ({movies}) => {
+const MoviesList: React.FC<Props> = ({movies , title}) => {
   return (
-    <View style={{flex: 1}}>
+    <View>
+      <Text style={styles.titleStyle}>{title}</Text>
       <FlatList
+        horizontal
         data={movies}
-        renderItem={({item}) => <Item data={item} />}
+        renderItem={({item}) => <MovieCard movie={item} />}
         keyExtractor={(item: Movie) => item.title}
       />
-    </View>)
+    </View>
+  );
 };
 
 export default MoviesList;
 
 const styles = StyleSheet.create({
- movieCard: {
-    backgroundColor: '#b9abab',
+  movieCard: {
     borderRadius: 10,
     padding: 20,
     marginVertical: 8,
     marginHorizontal: 16,
+    backgroundColor: '#b9abab',
+  },
+  titleStyle: {
+    fontSize: 30,
+    fontWeight: '600',
+    color: '#0c0404',
+    fontFamily: 'bold',
+    margin: 16
   }
 });
