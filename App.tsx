@@ -1,54 +1,48 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, FlatList, Text, View} from 'react-native';
+import React, { useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import LoginScreen from './src/components/screens/Login';
+import SignupScreen from './src/components/screens/Signup';
+import { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Home from './src/components/screens/Home';
 
-import {getListMovies, getListNowMovies} from './src/api/apiCalls/MoviesList';
-import {Movie} from '../MovieApp/src/components/models/ListModel';
-import MovieList from '../MovieApp/src/components/MoviesList';
-function App() {
-  const [moviesList, setMovies] = useState<Movie[]>([]);
-  const [NowPlayingMovies, setNowPlayingMovies] = useState<Movie[]>([]);
+const Stack = createNativeStackNavigator();
 
-  const [error, setError] = useState<string | null>(null);
+
+
+const App = () => {
+  const [userToken, setUserToken] = useState<string | null>(null);
+
   useEffect(() => {
-    const fetchMoviesList = async () => {
-      try {
-        const response = await getListMovies();
-        setMovies(response.data.results);
-      } catch (error: any) {
-        setError(error.message);
+    async function getUserToken() {
+      const savedUser = await AsyncStorage.getItem('user')
+      if (savedUser) {
+        const { username: savedUserName, password: savedPassword } = JSON.parse(savedUser)
+        setUserToken(savedUserName)
       }
-    };
-    const fetchNowPlayingMovies = async () => {
-      try {
-        const response = await getListNowMovies();
-        console.log('getListNowMovies ...', response.data);
-        setNowPlayingMovies(response.data.results);
-      } catch (error: any) {
-        setError(error.message);
-        console.log('error ...', error.message);
-      }
-    };
-    fetchNowPlayingMovies();
-    fetchMoviesList();
-  }, []);
+    }
+    getUserToken();
+  }, [userToken]);
+
+  const AuthStack = () => (
+    <Stack.Navigator  initialRouteName="Login" screenOptions={{headerShown:false}} >
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Signup" component={SignupScreen} />
+    </Stack.Navigator>
+  );
+  
+  const HomeStack = () => (
+    <Stack.Navigator>
+      <Stack.Screen name="HomeScreen" component={Home} />
+      </Stack.Navigator>
+  );
 
   return (
-    <View style={styles.container}>
-      <MovieList title={ "Now Palying Movies"}  movies={moviesList} />
-      <MovieList  title={ "Popular Movies"}  movies={NowPlayingMovies} />
-    </View>
+    <NavigationContainer>
+      {userToken ? <HomeStack /> : <AuthStack />}
+    </NavigationContainer>
   );
-}
-
-const styles = StyleSheet.create({
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  container: {
-    flex: 1,
-    backgroundColor : '#8f8d8d'
-  },
-});
+};
 
 export default App;
